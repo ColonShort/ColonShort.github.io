@@ -1,9 +1,86 @@
-<html>
- 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>USGS Earthquake Visualization</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
+
+  <!-- Our CSS -->
+  <link rel="stylesheet" type="text/css" href="static/css/style.css">
+</head>
+
 <body>
-  <h1>Colon</h1>
-  <p>Welcome to my website, stupid!</p>
-  <img src="https://content.codecademy.com/articles/github-pages-via-web-app/happy-ice-cream.gif" />
+  <!-- The div that holds our map -->
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+  <!-- Our JavaScript -->
+  <!-- Our JavaScript -->
+  <script>
+    // Create the map
+    var map = L.map('map').setView([0, 0], 2);
+
+    // Add the tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Get the earthquake data
+    var url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson';
+
+    // Create custom markers based on earthquake properties
+    function createMarkers(feature, latlng) {
+      var magnitude = feature.properties.mag;
+      var depth = feature.geometry.coordinates[2];
+
+      var markerOptions = {
+        radius: magnitude * 3,
+        fillColor: getColor(depth),
+        color: '#000',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+
+      return L.circleMarker(latlng, markerOptions);
+    }
+
+    // Define color scale for depth
+    function getColor(depth) {
+      return depth > 70 ? '#800026' :
+        depth > 50 ? '#BD0026' :
+        depth > 30 ? '#E31A1C' :
+        depth > 10 ? '#FC4E2A' :
+        '#FD8D3C';
+    }
+
+    // Add the earthquake data to the map
+    fetch(url)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        L.geoJSON(data, {
+          pointToLayer: createMarkers,
+          onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b>' + feature.properties.title + '</b><br>Magnitude: ' + feature.properties.mag);
+          }
+        }).addTo(map);
+      })
+      .catch(function (error) {
+        console.log('Error:', error);
+      });
+  </script>
 </body>
- 
+
 </html>
