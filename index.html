@@ -25,24 +25,23 @@
     integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
     crossorigin=""></script>
   <!-- Our JavaScript -->
-  <!-- Our JavaScript -->
   <script>
     // Create the map
     var map = L.map('map').setView([0, 0], 2);
-
+  
     // Add the tile layer (OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-
+  
     // Get the earthquake data
     var url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson';
-
+  
     // Create custom markers based on earthquake properties
     function createMarkers(feature, latlng) {
       var magnitude = feature.properties.mag;
       var depth = feature.geometry.coordinates[2];
-
+  
       var markerOptions = {
         radius: magnitude * 3,
         fillColor: getColor(depth),
@@ -51,10 +50,10 @@
         opacity: 1,
         fillOpacity: 0.8
       };
-
+  
       return L.circleMarker(latlng, markerOptions);
     }
-
+  
     // Define color scale for depth
     function getColor(depth) {
       return depth > 70 ? '#800026' :
@@ -63,7 +62,7 @@
         depth > 10 ? '#FC4E2A' :
         '#FD8D3C';
     }
-
+  
     // Add the earthquake data to the map
     fetch(url)
       .then(function (response) {
